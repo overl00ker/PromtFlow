@@ -335,7 +335,7 @@ void NodeScene::onFileUploaded(const QString &fileUri, const QString &mimeType,
             m_apiClient->requestImageGeneration(
                 m_cachedJsonPrompt,
                 m_pendingGenNode ? m_pendingGenNode->aspectRatio() : QStringLiteral("1:1"),
-                m_pendingGenNode ? m_pendingGenNode->resolution() : QStringLiteral("1K (1024)"),
+                m_pendingGenNode ? m_pendingGenNode->resolution() : QStringLiteral("FHD (1920x1080)"),
                 m_uploadedFiles
             );
         } else {
@@ -392,7 +392,7 @@ void NodeScene::continueWithEditGeneration()
     m_apiClient->requestImageGeneration(
         editPrompt,
         m_pendingGenNode ? m_pendingGenNode->aspectRatio() : QStringLiteral("1:1"),
-        m_pendingGenNode ? m_pendingGenNode->resolution()  : QStringLiteral("1K (1024)"),
+        m_pendingGenNode ? m_pendingGenNode->resolution()  : QStringLiteral("FHD (1920x1080)"),
         m_uploadedFiles);
 
     m_editMode = false;

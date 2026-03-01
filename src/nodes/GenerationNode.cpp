@@ -79,7 +79,7 @@ GenerationNode::GenerationNode(QGraphicsItem *parent)
         label->setFixedWidth(50);
         row->addWidget(label);
 
-        m_resBtn = new QPushButton("1K (1024)");
+        m_resBtn = new QPushButton("FHD (1920x1080)");
         m_resBtn->setStyleSheet(
             "QPushButton { background: #1e1e1e; color: #ccc; border: 1px solid #555;"
             "  border-radius: 3px; padding: 3px 8px; text-align: left; }"
@@ -207,9 +207,9 @@ GenerationNode::GenerationNode(QGraphicsItem *parent)
             "QMenu::item { padding: 6px 24px; }"
             "QMenu::item:selected { background: #3c78b5; color: white; }"
             "QMenu::separator { height: 1px; background: #555; margin: 4px 8px; }");
-        menu.addAction("1K (1024)");
-        menu.addAction("2K (2048)");
-        menu.addAction("4K (4096)");
+        menu.addAction("FHD (1920x1080)");
+        menu.addAction("QHD (2560x1440)");
+        menu.addAction("UHD (3840x2160)");
         menu.addSeparator();
         QAction *custom = menu.addAction("Custom...");
         QAction *chosen = menu.exec(QCursor::pos());

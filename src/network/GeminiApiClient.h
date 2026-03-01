@@ -52,7 +52,7 @@ signals:
 
 private:
     void onJsonReplyFinished(QNetworkReply *reply);
-    void onImageReplyFinished(QNetworkReply *reply);
+    void onImageReplyFinished(QNetworkReply *reply, const QString &aspectRatio, const QString &resolution);
     QString loadApiKey();
 
     QNetworkAccessManager *m_manager = nullptr;

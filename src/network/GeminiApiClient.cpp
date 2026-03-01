@@ -12,6 +12,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDebug>
+#include <QRegularExpression>
+#include <QtMath>
 
 static const QString kJsonModelUrl =
     QStringLiteral("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=");
@@ -350,6 +352,30 @@ void GeminiApiClient::requestImageGeneration(const QString &jsonPrompt,
     QJsonObject generationConfig;
     generationConfig["responseModalities"] = QJsonArray{ QStringLiteral("TEXT"), QStringLiteral("IMAGE") };
 
+    // New imageConfig for Flash Image
+    QJsonObject imageConfig;
+    if (!aspectRatio.isEmpty() && aspectRatio != "Auto") {
+        if (aspectRatio == "9:19.5") imageConfig["aspectRatio"] = "9:16"; // fallback nearest
+        else if (aspectRatio == "19.5:9") imageConfig["aspectRatio"] = "16:9"; 
+        else imageConfig["aspectRatio"] = aspectRatio;
+    }
+    
+    if (resolution.contains("1024") || resolution.contains("1K") || resolution.contains("FHD") || resolution.contains("1920")) {
+        imageConfig["imageSize"] = "1K";
+    } else if (resolution.contains("2048") || resolution.contains("2K") || resolution.contains("QHD") || resolution.contains("2560")) {
+        imageConfig["imageSize"] = "2K";
+    } else if (resolution.contains("4096") || resolution.contains("4K") || resolution.contains("UHD") || resolution.contains("3840")) {
+        imageConfig["imageSize"] = "4K";
+    } else if (resolution.contains("512")) {
+        imageConfig["imageSize"] = "0.5K";
+    } else {
+        imageConfig["imageSize"] = "1K"; // Default fallback
+    }
+
+    if (!imageConfig.isEmpty()) {
+        generationConfig["imageConfig"] = imageConfig;
+    }
+
     QJsonObject body;
     body["contents"] = QJsonArray{ userContent };
     body["generationConfig"] = generationConfig;
@@ -365,8 +391,8 @@ void GeminiApiClient::requestImageGeneration(const QString &jsonPrompt,
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     QNetworkReply *reply = m_manager->post(request, payload);
-    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
-        onImageReplyFinished(reply);
+    connect(reply, &QNetworkReply::finished, this, [this, reply, aspectRatio, resolution]() {
+        onImageReplyFinished(reply, aspectRatio, resolution);
     });
 }
 
@@ -428,7 +454,7 @@ void GeminiApiClient::onJsonReplyFinished(QNetworkReply *reply)
 
 
 
-void GeminiApiClient::onImageReplyFinished(QNetworkReply *reply)
+void GeminiApiClient::onImageReplyFinished(QNetworkReply *reply, const QString &aspectRatio, const QString &resolution)
 {
     reply->deleteLater();
     QByteArray responseBody = reply->readAll();
@@ -498,8 +524,43 @@ void GeminiApiClient::onImageReplyFinished(QNetworkReply *reply)
         emit thoughtsGenerated(thoughts);
     }
 
+    if (foundImage && !resultPixmap.isNull()) {
+        int targetW = 1024, targetH = 1024;
+        
+        QRegularExpression rxRes("(\\d+)x(\\d+)");
+        QRegularExpressionMatch matchRes = rxRes.match(resolution);
+        int baseLongEdge = 1024;
+        if (matchRes.hasMatch()) {
+            baseLongEdge = qMax(matchRes.captured(1).toInt(), matchRes.captured(2).toInt());
+        } else {
+            if (resolution.contains("1024") || resolution.contains("FHD") || resolution.contains("1920")) baseLongEdge = 1024;
+            else if (resolution.contains("2048") || resolution.contains("QHD") || resolution.contains("2560")) baseLongEdge = 2048;
+            else if (resolution.contains("4096") || resolution.contains("UHD") || resolution.contains("3840")) baseLongEdge = 4096;
+        }
 
-    if (foundImage) {
+        double ar = 1.0;
+        QRegularExpression rxAr("([\\d\\.]+):([\\d\\.]+)");
+        QRegularExpressionMatch matchAr = rxAr.match(aspectRatio);
+        if (matchAr.hasMatch()) {
+            double wRatio = matchAr.captured(1).toDouble();
+            double hRatio = matchAr.captured(2).toDouble();
+            if (hRatio > 0.0001) ar = wRatio / hRatio;
+        }
+
+        if (ar >= 1.0) {
+            targetW = baseLongEdge;
+            targetH = qRound(targetW / ar);
+        } else {
+            targetH = baseLongEdge;
+            targetW = qRound(targetH * ar);
+        }
+
+        QPixmap scaledPix = resultPixmap.scaled(targetW, targetH, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+        
+        int x = (scaledPix.width() - targetW) / 2;
+        int y = (scaledPix.height() - targetH) / 2;
+        resultPixmap = scaledPix.copy(x, y, targetW, targetH);
+        
         emit imageGenerated(resultPixmap);
     } else if (!thoughts.isEmpty()) {
         emit networkError("Model returned text instead of image:\n" + thoughts.left(500));

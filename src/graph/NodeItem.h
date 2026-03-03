@@ -10,11 +10,20 @@ class ConnectionLine;
 class QGraphicsProxyWidget;
 class QWidget;
 
+enum class PinType {
+    Any = 0,
+    Text,
+    Image,
+    Style,
+    Json
+};
+
 struct PinInfo
 {
     QString name;
     bool    isOutput    = false;
     bool    multiInput  = false;
+    PinType type        = PinType::Any;
 };
 
 class NodeItem : public QGraphicsItem

@@ -283,8 +283,7 @@ void NodeScene::requestImageEdit(GenerationNode *genNode,
     m_cachedPositive.clear();
     m_cachedNegative.clear();
 
-
-    QString tempPath = QDir::tempPath() + "/promptflow_edit_base.png";
+    QString tempPath = QDir::tempPath() + "/promtflow_edit_base.png";
     if (!currentImage.save(tempPath, "PNG")) {
         genNode->showApiError("Failed to save image to temporary file.");
         return;
@@ -643,10 +642,15 @@ void NodeScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             int idx = node->pinIndexAt(sp);
             if (idx < 0) continue;
 
-            const PinInfo &pin = node->pinAt(idx);
-            if (pin.isOutput) continue;
+            const PinInfo &targetPin = node->pinAt(idx);
+            if (targetPin.isOutput) continue;
 
-            if (!pin.multiInput && node->inputPinHasConnection(idx))
+            const PinInfo &sourcePin = m_dragSrc->pinAt(m_dragPin);
+            if (sourcePin.type != PinType::Any && targetPin.type != PinType::Any && sourcePin.type != targetPin.type) {
+                continue;
+            }
+
+            if (!targetPin.multiInput && node->inputPinHasConnection(idx))
                 continue;
 
             m_dragLine->setTarget(node, idx);

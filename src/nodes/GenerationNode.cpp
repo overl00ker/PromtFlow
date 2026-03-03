@@ -22,7 +22,7 @@ static constexpr int kResultBaseH    = 280;
 
 GenerationNode::GenerationNode(QGraphicsItem *parent)
     : NodeItem("Generation",
-               { PinInfo{"json_data", false} },
+               { PinInfo{"json_data", false, false, PinType::Json} },
                QColor(100, 60, 180),
                parent)
 {

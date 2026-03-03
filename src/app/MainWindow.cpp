@@ -10,6 +10,9 @@
 #include <QFileDialog>
 #include <QWheelEvent>
 #include <QMouseEvent>
+#include <QStandardPaths>
+#include <QCloseEvent>
+#include <QDir>
 
 class GraphView : public QGraphicsView
 {
@@ -78,6 +81,23 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_scene, &NodeScene::historyEntryReady,
             m_historyPanel, &HistoryPanel::addEntry);
+
+    QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    QDir().mkpath(dataDir);
+    QString autoSavePath = dataDir + "/autosave.json";
+    if (QFile::exists(autoSavePath)) {
+        m_scene->loadWorkflow(autoSavePath);
+    }
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    QDir().mkpath(dataDir);
+    QString autoSavePath = dataDir + "/autosave.json";
+    m_scene->saveWorkflow(autoSavePath);
+    
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::createHistoryDock()
@@ -156,4 +176,3 @@ void MainWindow::createMenus()
         "QMenu::item:selected { background: #3c78b5; }"
     );
 }
-

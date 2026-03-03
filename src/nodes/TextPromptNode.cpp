@@ -6,7 +6,7 @@
 
 TextPromptNode::TextPromptNode(QGraphicsItem *parent)
     : NodeItem("Text Prompt",
-               { PinInfo{"text", true} },
+               { PinInfo{"text", true, false, PinType::Text} },
                QColor(70, 130, 210),
                parent)
 {

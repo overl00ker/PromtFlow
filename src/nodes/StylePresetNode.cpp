@@ -55,10 +55,10 @@ const QVector<StylePresetData> &StylePresetNode::presets()
             "photo, digital, flat colors, 3d, vector art, smooth, blurry"
         },
         {
-            "Alcohol Ink",
-            "alcohol ink painting, fluid art, vibrant translucent colors, organic shapes, "
-            "golden accents, fluid boundaries, smooth gradients, abstract and delicate",
-            "photo, sharp details, 3d, pencil sketch, oil painting, structural"
+            "Alcohol Marker",
+            "A direct, full-frame scan of a traditional mixed media illustration on textured paper. The image fills the entire canvas without borders. Drawn with alcohol markers and fine liner pens. "
+            "Strongly visible paper grain and texture across the whole image surface. Sharp, precise, thin line art. Characteristic marker textures, streaks, and layering visible on clothes and shading. Cool color palette. Hand-drawn anime style, analog look, non-digital finish",
+            "photo, 3d, CGI, digital painting, smooth gradients, flat solid colors, border, frame, white margins"
         },
         {
             "Watercolor",
@@ -92,7 +92,7 @@ const QVector<StylePresetData> &StylePresetNode::presets()
 
 StylePresetNode::StylePresetNode(QGraphicsItem *parent)
     : NodeItem("Style Preset",
-               { PinInfo{"style_out", true} },
+               { PinInfo{"style_out", true, false, PinType::Style} },
                QColor(180, 80, 160),
                parent)
 {

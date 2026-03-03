@@ -11,11 +11,11 @@
 
 JsonPromptNode::JsonPromptNode(QGraphicsItem *parent)
     : NodeItem("JSON Builder",
-               { PinInfo{"positive_prompt", false, false},
-                 PinInfo{"negative_prompt", false, false},
-                 PinInfo{"image_refs",      false, true },
-                 PinInfo{"style_preset",    false, false},
-                 PinInfo{"json_data",       true,  false} },
+               { PinInfo{"positive_prompt", false, false, PinType::Text},
+                 PinInfo{"negative_prompt", false, false, PinType::Text},
+                 PinInfo{"image_refs",      false, true,  PinType::Image},
+                 PinInfo{"style_preset",    false, false, PinType::Style},
+                 PinInfo{"json_data",       true,  false, PinType::Json} },
                QColor(180, 160, 50),
                parent)
 {

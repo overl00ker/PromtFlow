@@ -10,7 +10,7 @@
 
 ImageRefNode::ImageRefNode(QGraphicsItem *parent)
     : NodeItem("Image Reference",
-               { PinInfo{"image_ref", true} },
+               { PinInfo{"image_ref", true, false, PinType::Image} },
                QColor(200, 100, 60),
                parent)
 {

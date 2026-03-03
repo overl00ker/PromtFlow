@@ -16,7 +16,7 @@
 #include <QtMath>
 
 static const QString kJsonModelUrl =
-    QStringLiteral("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-:generateContent?key=");
+    QStringLiteral("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=");
 
 static const QString kImageModelUrl =
     QStringLiteral("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key=");
@@ -568,5 +568,4 @@ void GeminiApiClient::onImageReplyFinished(QNetworkReply *reply, const QString &
         emit networkError("No image data found in API response.");
     }
 }
-
 

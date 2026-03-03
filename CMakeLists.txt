@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(PromptFlow LANGUAGES CXX)
+project(PromtFlow LANGUAGES CXX)
 
 set(QT_COMPILER "msvc2022_64" CACHE STRING "Qt compiler subdirectory")
 set(QT_ROOT     "D:/Qt/6.10.0" CACHE PATH   "Root Qt installation path")
